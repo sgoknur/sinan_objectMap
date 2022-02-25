@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const path = require("path");
+const Fs = require("fs");
 
 const { redirect } = require("express/lib/response");
 const { nextTick } = require("process");
@@ -20,9 +21,7 @@ function art_object(object_ID, ids_ID, iiif_baseuri) {
   this.iiif_baseuri = iiif_baseuri;
 }
 
-//let art_obj_array = [];
-
-let iiifbaseuri_array = [];
+let display_objects = [];
 
 function processData(api_data, art_obj_array = []) {
   for (let i = 0; i < api_data.length; i++) {
@@ -75,33 +74,56 @@ async function getAllData(api_url, page = 1, posts = []) {
   }
 }
 
+//Async download images
+
+async function downloadImage() {
+  const url = "https://unsplash.com/photos/AaEQmoufHLk/download?force=true";
+  const path_img = path.resolve(__dirname, "art_images", "code.jpg");
+  const writer = Fs.createWriteStream(path_img);
+
+  const response = await axios({
+    url,
+    method: "GET",
+    responseType: "stream",
+  });
+
+  response.data.pipe(writer);
+
+  return new Promise((resolve, reject) => {
+    writer.on("finish", resolve);
+    writer.on("error", reject);
+  });
+}
+
+//************ */
+
 app.get(
   "/admin",
   asyncHandler(async (req, res, next) => {
-    console.log("test 1 working");
+    let data = await getAllData(api_url);
+    console.log(`RETURNED FROM API CALL WITH DATA ${data.length}`);
 
-    let bar = await getAllData(api_url);
-    console.log(`RETURNED FINE WITH BAR ${bar.length}`);
-    let foo = processData(bar);
-    //getAll(api_url);
+    display_objects = processData(data);
+
+    let test = await downloadImage();
+    console.log("Downloaded image I think");
+
     res.writeHead(200, { "Content-Type": "text/html" });
     res.write("<h1>Admin Page</h1>");
-    console.log("test 2 working");
-    res.write("<p>executed</p>");
-    res.write(`length POSTS is ${bar.length}<br>`);
-    res.write(`length OBJ is ${foo.length}<br>`);
-    for (let i = 0; i < foo.length; i++) {
-      res.write(`object idsid is ${foo[i].iiif_baseuri} <br>`);
-    }
+    res.write(`<p>length POSTS is ${data.length}<br>`);
+    res.write(`length OBJ is ${display_objects.length}<br></p>`);
     res.end();
-    console.log("test 3 working");
   })
 );
 
 app.get("/", (req, res) => {
   res.writeHead(200, { "Content-Type": "text/html" });
   res.write("<h1>Currently Exhibited Works</h1>");
-  res.write(`<p>${respString}</p>`);
+  let img_url = "";
+  for (let i = 0; i < display_objects.length; i++) {
+    img_url = display_objects[i].iiif_baseuri + "/square/30,/0/default.jpg";
+    res.write(`<img src=${img_url} style="float:left;">`);
+  }
   res.end();
 });
 
