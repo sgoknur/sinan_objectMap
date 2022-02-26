@@ -23,6 +23,8 @@ function art_object(object_ID, ids_ID, iiif_baseuri) {
 
 let display_objects = [];
 
+const thumbnailSize = 40;
+
 function processData(api_data, art_obj_array = []) {
   for (let i = 0; i < api_data.length; i++) {
     for (let j = 0; j < api_data[i].records.length; j++) {
@@ -75,8 +77,8 @@ async function getAllData(api_url, page = 1, posts = []) {
 }
 
 //Async download images
-
-async function downloadImage() {
+//single image was working
+/*async function downloadImage() {
   const url = "https://unsplash.com/photos/AaEQmoufHLk/download?force=true";
   const path_img = path.resolve(__dirname, "art_images", "code.jpg");
   const writer = Fs.createWriteStream(path_img);
@@ -93,6 +95,46 @@ async function downloadImage() {
     writer.on("finish", resolve);
     writer.on("error", reject);
   });
+}*/
+
+//Async download images
+//batch images
+async function downloadImage(art_objects_array) {
+  try {
+    let promArray = [];
+    for (let i = 0; i < art_objects_array.length; i++) {
+      const url =
+        art_objects_array[i].iiif_baseuri +
+        "/square/" +
+        thumbnailSize +
+        ",/0/default.jpg";
+      const path_img = path.resolve(
+        __dirname,
+        "art_images",
+        `${art_objects_array[i].object_ID}.jpg`
+      );
+      const writer = Fs.createWriteStream(path_img);
+
+      const response = await axios({
+        url,
+        method: "GET",
+        responseType: "stream",
+      });
+
+      response.data.pipe(writer);
+
+      let my_promise = new Promise((resolve, reject) => {
+        writer.on("finish", resolve);
+        writer.on("error", reject);
+      });
+
+      promArray.push(my_promise);
+    }
+    let resolved = await Promise.all(promArray);
+    return;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 //************ */
@@ -105,8 +147,9 @@ app.get(
 
     display_objects = processData(data);
 
-    let test = await downloadImage();
-    console.log("Downloaded image I think");
+    //DOWNLOAD IMAGES -- KEEP WORKING ON THIS
+    //let test = await downloadImage(display_objects);
+    //console.log("Downloaded image I think");
 
     res.writeHead(200, { "Content-Type": "text/html" });
     res.write("<h1>Admin Page</h1>");
@@ -119,11 +162,17 @@ app.get(
 app.get("/", (req, res) => {
   res.writeHead(200, { "Content-Type": "text/html" });
   res.write("<h1>Currently Exhibited Works</h1>");
+
   let img_url = "";
   for (let i = 0; i < display_objects.length; i++) {
-    img_url = display_objects[i].iiif_baseuri + "/square/30,/0/default.jpg";
+    img_url =
+      display_objects[i].iiif_baseuri +
+      "/square/" +
+      thumbnailSize +
+      ",/0/default.jpg";
     res.write(`<img src=${img_url} style="float:left;">`);
   }
+
   res.end();
 });
 
