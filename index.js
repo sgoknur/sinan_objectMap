@@ -1,4 +1,6 @@
 const express = require("express");
+
+const { ConcurrencyManager } = require("axios-concurrency");
 const axios = require("axios");
 const path = require("path");
 const Fs = require("fs");
@@ -11,6 +13,17 @@ const port = 3000;
 
 const asyncHandler = require("express-async-handler");
 const { resolveObjectURL } = require("buffer");
+
+//EJS bizness
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "./views"));
+
+//This folder path is needed for re-creating and servicing image URLs to client
+const art_images_folder = "./art_images/";
+
+//Middlewar
+//app.use(express.static(path.join(__dirname, "./art_images")));
+app.use("/art_images", express.static(__dirname + "/art_images"));
 
 let respString = "";
 
@@ -101,6 +114,10 @@ async function getAllData(api_url, page = 1, posts = []) {
 //batch images
 async function downloadImage(art_objects_array) {
   try {
+    //Concurrency test
+    // a concurrency parameter of 1 makes all api requests secuential
+    const MAX_CONCURRENT_REQUESTS = 10;
+
     let promArray = [];
     for (let i = 0; i < art_objects_array.length; i++) {
       const url =
@@ -115,11 +132,22 @@ async function downloadImage(art_objects_array) {
       );
       const writer = Fs.createWriteStream(path_img);
 
+      const instance = axios.create({
+        method: "GET",
+        responseType: "stream",
+      });
+
+      // init your manager.
+      const manager = ConcurrencyManager(instance, MAX_CONCURRENT_REQUESTS);
+
+      const response = await instance.get(url);
+
+      /*THIS WAS WORKING
       const response = await axios({
         url,
         method: "GET",
         responseType: "stream",
-      });
+      });*/
 
       response.data.pipe(writer);
 
@@ -137,8 +165,6 @@ async function downloadImage(art_objects_array) {
   }
 }
 
-//************ */
-
 app.get(
   "/admin",
   asyncHandler(async (req, res, next) => {
@@ -148,8 +174,8 @@ app.get(
     display_objects = processData(data);
 
     //DOWNLOAD IMAGES -- KEEP WORKING ON THIS
-    //let test = await downloadImage(display_objects);
-    //console.log("Downloaded image I think");
+    let test = await downloadImage(display_objects);
+    console.log("Downloaded image I think");
 
     res.writeHead(200, { "Content-Type": "text/html" });
     res.write("<h1>Admin Page</h1>");
@@ -160,9 +186,11 @@ app.get(
 );
 
 app.get("/", (req, res) => {
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.write("<h1>Currently Exhibited Works</h1>");
+  //res.writeHead(200, { "Content-Type": "text/html" });
+  //res.write("<h1>Currently Exhibited Works</h1>");
 
+  /*
+  //Direct writing of images working
   let img_url = "";
   for (let i = 0; i < display_objects.length; i++) {
     img_url =
@@ -171,9 +199,32 @@ app.get("/", (req, res) => {
       thumbnailSize +
       ",/0/default.jpg";
     res.write(`<img src=${img_url} style="float:left;">`);
-  }
+  }*/
 
-  res.end();
+  //TO DO : Populate urlArray
+  //Read in name of file in art_images
+
+  //let fsPromises = Fs.promises;
+
+  /*Fs.readdir(art_images_folder, (err, files) => {
+    files.forEach((file) => {
+      console.log(path.join(art_images_folder, file));
+      urlArray.push(path.join(art_images_folder, file));
+    });
+  });
+*/
+
+  let fileNames = Fs.readdirSync(art_images_folder);
+  let urlArray = fileNames.map((x) => "." + art_images_folder + x);
+
+  console.log(`URL ARRAY HAS ${urlArray.length} elements`);
+  console.log(urlArray[0]);
+
+  //Renders EJS file, and passes urlArray
+  //res.render("index", { urlArray: urlArray });
+  res.render("index", { urlArray: urlArray });
+
+  //res.end();
 });
 
 app.use((err, req, res, next) => {

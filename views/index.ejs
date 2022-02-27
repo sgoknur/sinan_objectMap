@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="HTML, CSS, javaScript, Node, Express" />
+    <meta name="author" content="sinan goknur" />
+    <title>HAM Sandbox</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+
+    <!-- BOOTSRAP 5 -->
+    <!-- Latest compiled and minified CSS -->
+    <!--link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    /-->
+
+    <!-- Latest compiled JavaScript -->
+    <!--script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>-->
+
+    <!-- my css-->
+    <!--<link href="css/main.css" rel="stylesheet">-->
+  </head>
+  <body>
+    <div>
+      <img src="../art_images/1430.jpg" />
+      <% urlArray.forEach((url) => { %>
+      <img src="<%= url %>" />
+      <% }) %>
+    </div>
+  </body>
+</html>
