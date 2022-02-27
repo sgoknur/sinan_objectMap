@@ -142,7 +142,9 @@ async function downloadImage(art_objects_array) {
 
       const response = await instance.get(url);
 
-      /*THIS WAS WORKING
+      /*
+      //THIS WAS WORKING BUT I HAD TO CHANGE IT
+      //for CONCURRENCY MANAGER
       const response = await axios({
         url,
         method: "GET",
@@ -158,6 +160,7 @@ async function downloadImage(art_objects_array) {
 
       promArray.push(my_promise);
     }
+
     let resolved = await Promise.all(promArray);
     return;
   } catch (error) {
@@ -215,6 +218,13 @@ app.get("/", (req, res) => {
 */
 
   let fileNames = Fs.readdirSync(art_images_folder);
+
+  //TO DO: when I was messing around with the folder, a .DS_Store
+  //was introduced, this means urlArray had an element that said
+  //../art_images/.DS_Store so of course that was displayed as a
+  //broken image link. I think I can check on the extension to make
+  //sure it is .jpg to enter it into the urlArray
+
   let urlArray = fileNames.map((x) => "." + art_images_folder + x);
 
   console.log(`URL ARRAY HAS ${urlArray.length} elements`);

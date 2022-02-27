@@ -12,6 +12,38 @@
         margin: 0;
         padding: 0;
       }
+
+      body {
+        background-color: black;
+      }
+
+      a:link,
+      a:visited,
+      a:active,
+      a:hover,
+      a:focus {
+        text-decoration: none;
+      }
+
+      #artGrid {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .art_img {
+        /*margin: 1px;*/
+        display: block;
+        position: relative;
+      }
+      .art_img:hover {
+        outline: 1px solid lightgoldenrodyellow;
+
+        /* in order: x offset, y offset, blur size, spread size, color */
+        /* blur size and spread size are optional (they default to 0) */
+        box-shadow: 0px 0px 8px 15px lightgoldenrodyellow;
+
+        /*this is so that the outline is not obscured by the next element*/
+        z-index: 3000;
+      }
     </style>
 
     <!-- BOOTSRAP 5 -->
@@ -28,10 +60,9 @@
     <!--<link href="css/main.css" rel="stylesheet">-->
   </head>
   <body>
-    <div>
-      <img src="../art_images/1430.jpg" />
+    <div id="artGrid">
       <% urlArray.forEach((url) => { %>
-      <img src="<%= url %>" />
+      <a href=""><img class="art_img" src="<%= url %>" /></a>
       <% }) %>
     </div>
   </body>
