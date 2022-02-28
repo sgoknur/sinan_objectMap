@@ -189,34 +189,7 @@ app.get(
 );
 
 app.get("/", (req, res) => {
-  //res.writeHead(200, { "Content-Type": "text/html" });
-  //res.write("<h1>Currently Exhibited Works</h1>");
-
-  /*
-  //Direct writing of images is working
-  let img_url = "";
-  for (let i = 0; i < display_objects.length; i++) {
-    img_url =
-      display_objects[i].iiif_baseuri +
-      "/square/" +
-      thumbnailSize +
-      ",/0/default.jpg";
-    res.write(`<img src=${img_url} style="float:left;">`);
-  }*/
-
-  //TO DO : Populate urlArray
-  //Read in name of file in art_images
-
-  //let fsPromises = Fs.promises;
-
-  /*Fs.readdir(art_images_folder, (err, files) => {
-    files.forEach((file) => {
-      console.log(path.join(art_images_folder, file));
-      urlArray.push(path.join(art_images_folder, file));
-    });
-  });
-*/
-
+  //Read in name of files in art_images
   let fileNames = Fs.readdirSync(art_images_folder);
 
   //TO DO: when I was messing around with the folder, a .DS_Store
@@ -225,10 +198,11 @@ app.get("/", (req, res) => {
   //broken image link. I think I can check on the extension to make
   //sure it is .jpg to enter it into the urlArray
 
-  //THIS IS WORKING, COMMENTING OUT FOR TESTING
+  //THIS IS WORKING, COMMENTING OUT FOR TESTING SERVING IMAGES W/O DOWNLOADING
   //let urlArray = fileNames.map((x) => "." + art_images_folder + x);
-
+  //Instead I will populate the urlArray with IIIFuri's
   let urlArray = [];
+
   let img_url = "";
 
   for (let i = 0; i < display_objects.length; i++) {
