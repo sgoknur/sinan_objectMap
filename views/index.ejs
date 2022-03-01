@@ -62,9 +62,16 @@
   </head>
   <body>
     <div id="artGrid">
-      <% urlArray.forEach((url) => { %>
-      <a href=""><img class="art_img" src="<%= url %>" /></a>
-      <% }) %>
+      <% for(let i=0; i <urlArray.length; i++) { %>
+      <a href=""
+        ><img
+          class="art_img"
+          id="<%= objIDs[i] %>"
+          src="<%= urlArray[i] %>"
+          onError="this.parentNode.style.display='none'"
+      /></a>
+      <% } %>
     </div>
+    <script></script>
   </body>
 </html>

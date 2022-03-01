@@ -202,8 +202,10 @@ app.get("/", (req, res) => {
   //let urlArray = fileNames.map((x) => "." + art_images_folder + x);
   //Instead I will populate the urlArray with IIIFuri's
   let urlArray = [];
+  let objIDs = [];
 
   let img_url = "";
+  let objid = "";
 
   for (let i = 0; i < display_objects.length; i++) {
     img_url =
@@ -212,15 +214,21 @@ app.get("/", (req, res) => {
       thumbnailSize +
       ",/0/default.jpg";
 
+    objid = display_objects[i].object_ID;
+
     urlArray.push(img_url);
+    objIDs.push(objid);
   }
 
   console.log(`URL ARRAY HAS ${urlArray.length} elements`);
+  console.log(`OBJ ID ARRAY HAS ${objIDs.length} elements`);
   console.log(urlArray[0]);
+  console.log(objIDs[0]);
 
   //Renders EJS file, and passes urlArray
+  //TO DO: Also Pass an Object ID array that corresponds to the urlArray
   //res.render("index", { urlArray: urlArray });
-  res.render("index", { urlArray: urlArray });
+  res.render("index", { urlArray: urlArray, objIDs: objIDs });
 
   //res.end();
 });
