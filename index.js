@@ -62,6 +62,18 @@ function processData(api_data, art_obj_array = []) {
   return art_obj_array;
 }
 
+async function getObject(object_id) {
+  try {
+    const query_url = `https://api.harvardartmuseums.org/object/${object_id}?apikey=bc950edf-09f5-4d10-8522-99818d613439`;
+    const objResponse = await axios.get(query_url);
+    return objResponse.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//This is the URL for all the artworks shown in galleries currently that do not have
+//image permission restrictions and that have valid idsd
 const api_url =
   "https://api.harvardartmuseums.org/object?apikey=bc950edf-09f5-4d10-8522-99818d613439&gallery=any&size=100&q=imagepermissionlevel:0 AND images.idsid:>0";
 
@@ -232,6 +244,16 @@ app.get("/", (req, res) => {
 
   //res.end();
 });
+
+app.get(
+  "/object/:objID",
+  asyncHandler(async (req, res, next) => {
+    console.log(req.params.objID);
+    let obj = await getObject(req.params.objID);
+    console.log(JSON.stringify(obj));
+    res.end();
+  })
+);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

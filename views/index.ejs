@@ -35,6 +35,9 @@
         position: relative;
       }
       .art_img:hover {
+
+        cursor: pointer;
+
         /*outline: 1px solid lightgoldenrodyellow;*/
         outline: 2px solid gray;
 
@@ -63,15 +66,23 @@
   <body>
     <div id="artGrid">
       <% for(let i=0; i <urlArray.length; i++) { %>
-      <a href=""
-        ><img
+      <img
           class="art_img"
           id="<%= objIDs[i] %>"
           src="<%= urlArray[i] %>"
-          onError="this.parentNode.style.display='none'"
-      /></a>
+          onError="this.style.display='none'"
+      />
       <% } %>
     </div>
-    <script></script>
+    <script>
+      let images = document.querySelectorAll(".art_img");
+      for (let i=0; i< images.length; i++){
+        images[i].addEventListener("click", selectArtObject);
+      }
+      function selectArtObject(){
+        console.log(this.id);
+        fetch(`http://localhost:3000/object/${this.id}`);
+      }
+    </script>
   </body>
 </html>
