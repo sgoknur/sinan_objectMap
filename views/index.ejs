@@ -81,7 +81,18 @@
       }
       function selectArtObject(){
         console.log(this.id);
-        fetch(`http://localhost:3000/object/${this.id}`);
+          fetch(`http://localhost:3000/object/${this.id}`).then(response => {
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              throw new TypeError("Oops, we haven't got JSON!");
+            }
+            return response.json();
+          }).then(data => {
+            console.log(JSON.stringify(data));
+            /*PROCESS AND SHOW JSON DATA IN A GRID OVERLAY*/
+            //STORE IIIF _URLs and Color Info for Second Page of Overlay
+          }).catch(error=> console.error(error));
+        
       }
     </script>
   </body>

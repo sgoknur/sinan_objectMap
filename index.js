@@ -250,8 +250,8 @@ app.get(
   asyncHandler(async (req, res, next) => {
     console.log(req.params.objID);
     let obj = await getObject(req.params.objID);
-    console.log(JSON.stringify(obj));
-    res.end();
+    //console.log(JSON.stringify(obj));
+    res.json(obj);
   })
 );
 
