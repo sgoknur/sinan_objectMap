@@ -7,6 +7,9 @@
     <meta name="author" content="sinan goknur" />
     <title>HAM Sandbox</title>
     <style>
+      /*@import url('https://fonts.googleapis.com/css2?family=League+Gothic&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');*/
+      @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500&family=Signika+Negative:wght@300;400;500;600&display=swap');
+
       * {
         box-sizing: border-box;
         margin: 0;
@@ -15,6 +18,110 @@
 
       body {
         background-color: black;
+        font-family: "Open Sans", sans-serif;
+      }
+
+      .coma{
+        font-family: "Lucida Console", Monaco, monospace;
+        font-size: 18vh;
+      }
+
+      #overlay_object{
+        position: fixed; /*sit on top of page content */
+        
+        /*display: flex;
+        align-items: center;
+        justify-content: center;*/
+      
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease-in; 
+        height: 0%; /* start as not taking up any space so objects are clickable beneath*/
+        overflow: hidden;
+        width: 100%; /* cover the page width-wise*/
+      
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0,0,0,0.7);
+        z-index: 3;
+
+
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-areas:
+          "a1 a2 a3"
+          "b1 b2 b3"
+          "c1 c2 c3";
+      }
+
+      .curlyBracket{
+        color: white;
+        font-weight: 400;
+        font-size: 22vh;
+
+      }
+
+      .cbL{
+        grid-area: a1;
+        align-self: center;
+        justify-self: center;
+      }
+
+      .cbR{
+        grid-area: c3;
+        align-self: center;
+        justify-self: center;
+      }
+
+      #selected_obj{
+        grid-area: b2;
+        align-self: center;
+        justify-self: center;
+        max-width: 30vw;
+        max-height: 30vh;
+      }
+
+      .dataText{
+        color: white;
+      }
+
+      .a2{
+        grid-area: a2;
+        align-self: center;
+        justify-self: center;
+      }
+
+      .a3{
+        grid-area: a3;
+        align-self: center;
+        justify-self: center;
+      }
+
+      .b1{
+        grid-area: b1;
+        align-self: center;
+        justify-self: center;
+      }
+
+      .b3{
+        grid-area: b3;
+        align-self: center;
+        justify-self: center;
+      }
+
+      .c1{
+        grid-area: c1;
+        align-self: center;
+        justify-self: center;
+      }
+
+      .c2{
+        grid-area: c2;
+        align-self: center;
+        justify-self: center;
       }
 
       a:link,
@@ -43,10 +150,12 @@
 
         /* in order: x offset, y offset, blur size, spread size, color */
         /* blur size and spread size are optional (they default to 0) */
-        box-shadow: 0px 0px 8px 15px lightgoldenrodyellow;
+        /*box-shadow: 0px 0px 8px 15px lightgoldenrodyellow;*/
+        box-shadow: 0px 0px 8px 15px lightcyan;
+
 
         /*this is so that the outline is not obscured by the next element*/
-        z-index: 3000;
+        z-index: 2;
       }
     </style>
 
@@ -64,6 +173,18 @@
     <!--<link href="css/main.css" rel="stylesheet">-->
   </head>
   <body>
+    <div id="overlay_object" onclick="overlay_off()">
+      <p class="curlyBracket cbL">{</p>
+      <p class="dataText a2">parse JSON and stick some data here</p>
+      <p class="dataText a3">parse JSON and stick some other data here</p>
+      <p class="dataText b1">parse JSON and stick some more data here</p>
+      <img id="selected_obj" src=""/>
+      <p class="dataText b3">parse JSON and stick yet more data here</p>
+      <p class="dataText c1">parse JSON and keep on sticking more data here</p>
+      <p class="dataText c2">parse JSON and ok almost the last data stick here</p>
+      <p class="curlyBracket cbR">}<span class="coma">,</span></p>
+    </div>
+
     <div id="artGrid">
       <% for(let i=0; i <urlArray.length; i++) { %>
       <img
@@ -75,12 +196,18 @@
       <% } %>
     </div>
     <script>
+      /*Attach the selectArtObject function to every image displayed*/
       let images = document.querySelectorAll(".art_img");
       for (let i=0; i< images.length; i++){
         images[i].addEventListener("click", selectArtObject);
       }
+
+      /*Fetch JSON based on object ID when object is selected*/
       function selectArtObject(){
         console.log(this.id);
+
+        let base_iiif_uri = "";
+
           fetch(`http://localhost:3000/object/${this.id}`).then(response => {
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
@@ -88,12 +215,46 @@
             }
             return response.json();
           }).then(data => {
-            console.log(JSON.stringify(data));
+            //console.log(JSON.stringify(data));
+
             /*PROCESS AND SHOW JSON DATA IN A GRID OVERLAY*/
             //STORE IIIF _URLs and Color Info for Second Page of Overlay
+
+            base_iiif_uri = data.images[0].iiifbaseuri;
+            //console.log(`base uri is ${base_iiif_uri}`);
+            let img_url = base_iiif_uri + "/full/max/0/default.jpg";
+            //console.log(`image url is ${img_url}`);
+            //document.getElementById("selected_obj").src = img_url;
+
+            overlay_on(img_url);
+
           }).catch(error=> console.error(error));
-        
+
+          //PARSE JSON DATA
+
+          //Generate IIIF url
+          
+
+          
       }
+
+      function overlay_on(url){
+        /* turn on the div */
+        document.getElementById("overlay_object").style.height = '100%';
+        document.getElementById("overlay_object").style.visibility = 'visible';
+        document.getElementById("overlay_object").style.opacity = '1';
+        document.getElementById("selected_obj").src = url;
+
+      }
+
+      function overlay_off(){
+        document.getElementById("overlay_object").style.height = '0%';
+        document.getElementById("overlay_object").style.visibility = 'hidden';
+        document.getElementById("overlay_object").style.opacity = '0';
+        document.getElementById("selected_obj").src = "";
+
+      }
+
     </script>
   </body>
 </html>
