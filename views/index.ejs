@@ -21,6 +21,26 @@
         font-family: "Open Sans", sans-serif;
       }
 
+/* the SVG icon works but not loving it
+      svg{
+        z-index: 4;
+        align-self: center;
+      }
+
+      #icon_stackRect{
+        fill: white;
+        stroke: black; 
+        stroke-width: 1px;
+      }
+
+      #icon_circle{
+        fill: none;
+        stroke: white; 
+        stroke-width: 8px;
+      }
+
+      */
+
       .coma{
         font-family: "Lucida Console", Monaco, monospace;
         font-size: 18vh;
@@ -28,10 +48,6 @@
 
       #overlay_object{
         position: fixed; /*sit on top of page content */
-        
-        /*display: flex;
-        align-items: center;
-        justify-content: center;*/
       
         visibility: hidden;
         opacity: 0;
@@ -76,14 +92,6 @@
         justify-self: center;
       }
 
-      #selected_obj{
-        grid-area: b2;
-        align-self: center;
-        justify-self: center;
-        max-width: 30vw;
-        max-height: 30vh;
-      }
-
       .dataText{
         color: white;
       }
@@ -106,6 +114,10 @@
         justify-self: center;
       }
 
+      .b2{
+        grid-area: b2;
+      }
+
       .b3{
         grid-area: b3;
         align-self: center;
@@ -122,6 +134,19 @@
         grid-area: c2;
         align-self: center;
         justify-self: center;
+      }
+
+      #selected_obj{
+        align-self: center;
+        justify-self: center;
+        max-width: 33vw;
+        max-height: 33vh;
+      }
+
+      #selected_obj:hover{
+        cursor: pointer;
+        outline: 3px solid white;
+        /*box-shadow: 0px 0px 10px 4px lightgoldenrodyellow;*/
       }
 
       a:link,
@@ -146,13 +171,11 @@
         cursor: pointer;
 
         /*outline: 1px solid lightgoldenrodyellow;*/
-        outline: 2px solid gray;
-
+        outline: 6px solid white;
         /* in order: x offset, y offset, blur size, spread size, color */
         /* blur size and spread size are optional (they default to 0) */
         /*box-shadow: 0px 0px 8px 15px lightgoldenrodyellow;*/
-        box-shadow: 0px 0px 8px 15px lightcyan;
-
+        box-shadow: 0px 0px 10px 15px white;
 
         /*this is so that the outline is not obscured by the next element*/
         z-index: 2;
@@ -178,7 +201,23 @@
       <p class="dataText a2">parse JSON and stick some data here</p>
       <p class="dataText a3">parse JSON and stick some other data here</p>
       <p class="dataText b1">parse JSON and stick some more data here</p>
-      <img id="selected_obj" src=""/>
+
+      <!-- THE SVG ICON WORKS BUT NOT LOVING IT
+     <svg id="icon" class="b2" version="1.1"
+      width="100" height="100"
+      xmlns="http://www.w3.org/2000/svg" onmouseenter="svgHover()" onmouseleave="svgReset()">
+      <g transform="scale(0.5) translate(50,50)">
+        <g id="icon_stackRect" transform="scale(0.5) translate(50,50)">
+          <polygon points="0, 75 50, 50 100, 75 50, 100"/>
+          <polygon points="0, 50 50, 25 100, 50 50, 75"/>
+          <polygon points="0, 25 50, 0 100, 25 50, 50"/>
+        </g>
+        <circle id="icon_circle" cx="50" cy="50" r="45"/>
+      </g>
+      </svg>
+      -->
+      
+      <img id="selected_obj" class="b2" src=""/>
       <p class="dataText b3">parse JSON and stick yet more data here</p>
       <p class="dataText c1">parse JSON and keep on sticking more data here</p>
       <p class="dataText c2">parse JSON and ok almost the last data stick here</p>
@@ -252,6 +291,17 @@
         document.getElementById("overlay_object").style.visibility = 'hidden';
         document.getElementById("overlay_object").style.opacity = '0';
         document.getElementById("selected_obj").src = "";
+
+      }
+
+      function svgHover(){
+       document.getElementById("icon_circle").style.stroke = "yellow";
+       document.getElementById("icon_stackRect").style.fill = "yellow";
+      }
+
+      function svgReset(){
+        document.getElementById("icon_circle").style.stroke = "white";
+       document.getElementById("icon_stackRect").style.fill = "white";
 
       }
 

@@ -24,6 +24,7 @@ const art_images_folder = "./art_images/";
 //Middlewar
 //app.use(express.static(path.join(__dirname, "./art_images")));
 app.use("/art_images", express.static(__dirname + "/art_images"));
+app.use("/static", express.static(__dirname + "/static"));
 
 let respString = "";
 
