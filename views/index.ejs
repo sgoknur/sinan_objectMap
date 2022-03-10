@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="keywords" content="HTML, CSS, javaScript, Node, Express" />
     <meta name="author" content="sinan goknur" />
-    <title>HAM Sandbox</title>
+    <title>Object Map 2022</title>
     <style>
       /*@import url('https://fonts.googleapis.com/css2?family=League+Gothic&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');*/
       @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500&family=Signika+Negative:wght@300;400;500;600&display=swap');
@@ -26,7 +26,7 @@
         align-self: center;
         justify-self: center;
         opacity: 0;
-        transition: all 1s ease;
+        transition: all 1s ease-out;
       }
 
       #icon_stackRect{
@@ -46,12 +46,39 @@
         font-size: 18vh;
       }
 
-      #overlay_object{
+      #images_overlay{
         position: fixed; /*sit on top of page content */
       
         visibility: hidden;
         opacity: 0;
         transition: opacity 0.3s ease-in; 
+        height: 0%; /* start as not taking up any space so objects are clickable beneath*/
+        overflow: hidden;
+        width: 100%; /* cover the page width-wise*/
+      
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0,0,0,0.7);
+        z-index: 5;
+
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-areas:
+          "a a a"
+          "b c c"
+          "d c c";
+
+      }
+
+      #object_overlay{
+        position: fixed; /*sit on top of page content */
+      
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.5s ease-in; 
         height: 0%; /* start as not taking up any space so objects are clickable beneath*/
         overflow: hidden;
         width: 100%; /* cover the page width-wise*/
@@ -141,7 +168,7 @@
         justify-self: center;
         max-width: 33vw;
         max-height: 33vh;
-        transition: all 1s ease;
+        transition: all 2s ease;
       }
 
       a:link,
@@ -191,13 +218,21 @@
     <!--<link href="css/main.css" rel="stylesheet">-->
   </head>
   <body>
-    <div id="overlay_object" onclick="overlay_off()">
+    
+    <div id="images_overlay">
+      <div id="aaa"></div>
+      <p id="imageGalleryTxt"></p>
+      <div id="color"></div>
+      <img id="image_magnify" src=""/>
+    </div>
+
+    <div id="object_overlay" onclick="overlay_off()">
       <p class="curlyBracket cbL">{</p>
-      <p class="dataText a2">parse JSON and stick some data here</p>
+      <p id="obj_txt_1" class="dataText a2">parse JSON and stick some data here</p>
       <p class="dataText a3">parse JSON and stick some other data here</p>
       <p class="dataText b1">parse JSON and stick some more data here</p>
 
-      <img id="selected_obj" class="b2" src=""  onmouseenter="svgHover()" onmouseleave="svgGone()"/>
+      <img id="selected_obj" class="b2" src=""  onclick="imagesOverlay()" onmouseenter="svgHover()" onmouseleave="svgGone()"/>
   
       <!-- ICON -->
      <svg id="icon" class="b2" version="1.1"
@@ -228,6 +263,8 @@
       <% } %>
     </div>
     <script>
+      /*global variable to store JSON for object selected */
+      let selected_object_data;
       /*Attach the selectArtObject function to every image displayed*/
       let images = document.querySelectorAll(".art_img");
       for (let i=0; i< images.length; i++){
@@ -249,8 +286,13 @@
           }).then(data => {
             //console.log(JSON.stringify(data));
 
+            
+            //Save data 
+            selected_object_data = data;
+
             /*PROCESS AND SHOW JSON DATA IN A GRID OVERLAY*/
             //STORE IIIF _URLs and Color Info for Second Page of Overlay
+
 
             base_iiif_uri = data.images[0].iiifbaseuri;
             //console.log(`base uri is ${base_iiif_uri}`);
@@ -261,35 +303,33 @@
             overlay_on(img_url);
 
           }).catch(error=> console.error(error));
-
-          //PARSE JSON DATA
-
-          //Generate IIIF url
-          
-
-          
+    
       }
 
       function overlay_on(url){
         /* turn on the div */
-        document.getElementById("overlay_object").style.height = '100%';
-        document.getElementById("overlay_object").style.visibility = 'visible';
-        document.getElementById("overlay_object").style.opacity = '1';
+        document.getElementById("object_overlay").style.height = '100%';
+        document.getElementById("object_overlay").style.visibility = 'visible';
+        document.getElementById("object_overlay").style.opacity = '1';
         document.getElementById("selected_obj").src = url;
+
+        //Parse data, display and store data for reference later
+        /*document.getElementById("obj_txt_1").textContent = selected_object_data.culture;*/
+
 
       }
 
       function overlay_off(){
-        document.getElementById("overlay_object").style.height = '0%';
-        document.getElementById("overlay_object").style.visibility = 'hidden';
-        document.getElementById("overlay_object").style.opacity = '0';
+        document.getElementById("object_overlay").style.height = '0%';
+        document.getElementById("object_overlay").style.visibility = 'hidden';
+        document.getElementById("object_overlay").style.opacity = '0';
         document.getElementById("selected_obj").src = "";
 
       }
 
       function svgHover(){
         /*document.getElementById("selected_obj").style.filter = "grayscale(60) blur(3px)";*/
-        document.getElementById("selected_obj").style.filter = "blur(1px)";
+        document.getElementById("selected_obj").style.filter = "grayscale(90) brightness(30%) blur(1px)";
         document.getElementById("selected_obj").style.cursor = "pointer";
         document.getElementById("icon").style.opacity = '1';
         document.getElementById("icon").style.cursor = "pointer";
@@ -302,6 +342,11 @@
       function svgGone(){
         document.getElementById("selected_obj").style.filter = "grayscale(0) blur(0px)";
         document.getElementById("icon").style.opacity = '0';
+      }
+
+      function imagesOverlay(){
+
+
       }
 
     </script>

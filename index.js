@@ -75,8 +75,11 @@ async function getObject(object_id) {
 
 //This is the URL for all the artworks shown in galleries currently that do not have
 //image permission restrictions and that have valid idsd
+//const api_url =
+//"https://api.harvardartmuseums.org/object?apikey=bc950edf-09f5-4d10-8522-99818d613439&gallery=any&size=100&q=imagepermissionlevel:0 AND images.idsid:>0";
+
 const api_url =
-  "https://api.harvardartmuseums.org/object?apikey=bc950edf-09f5-4d10-8522-99818d613439&gallery=any&size=100&q=imagepermissionlevel:0 AND images.idsid:>0";
+  "https://api.harvardartmuseums.org/object?apikey=bc950edf-09f5-4d10-8522-99818d613439&gallery=any&size=100&q=images.idsid:>0";
 
 //Async fetch all API data
 async function getAllData(api_url, page = 1, posts = []) {
