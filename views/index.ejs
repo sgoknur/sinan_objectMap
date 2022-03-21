@@ -121,6 +121,11 @@
 
       .dataText{
         color: white;
+        white-space: pre-line;
+      }
+
+      .dataHeading{
+        color: aqua;
       }
 
       .a2{
@@ -228,9 +233,9 @@
 
     <div id="object_overlay" onclick="overlay_off()">
       <p class="curlyBracket cbL">{</p>
-      <p id="obj_txt_1" class="dataText a2">parse JSON and stick some data here</p>
-      <p class="dataText a3">parse JSON and stick some other data here</p>
-      <p class="dataText b1">parse JSON and stick some more data here</p>
+      <div class="dataText a2">parse JSON and stick some data here</div>
+      <div class="dataText a3">parse JSON and stick some other data here</div>
+      <div class="dataText b1">parse JSON and stick some more data here</div>
 
       <img id="selected_obj" class="b2" src=""  onclick="imagesOverlay()" onmouseenter="svgHover()" onmouseleave="svgGone()"/>
   
@@ -264,7 +269,7 @@
     </div>
     <script>
       /*global variable to store JSON for object selected */
-      let selected_object_data;
+      //let selected_object_data;
       /*Attach the selectArtObject function to every image displayed*/
       let images = document.querySelectorAll(".art_img");
       for (let i=0; i< images.length; i++){
@@ -288,7 +293,7 @@
 
             
             //Save data 
-            selected_object_data = data;
+            let selected_object_data = data;
 
             /*PROCESS AND SHOW JSON DATA IN A GRID OVERLAY*/
             //STORE IIIF _URLs and Color Info for Second Page of Overlay
@@ -300,21 +305,54 @@
             //console.log(`image url is ${img_url}`);
             //document.getElementById("selected_obj").src = img_url;
 
-            overlay_on(img_url);
+            overlay_on(img_url, selected_object_data);
 
           }).catch(error=> console.error(error));
     
       }
 
-      function overlay_on(url){
+      function overlay_on(url, data){
         /* turn on the div */
         document.getElementById("object_overlay").style.height = '100%';
         document.getElementById("object_overlay").style.visibility = 'visible';
         document.getElementById("object_overlay").style.opacity = '1';
         document.getElementById("selected_obj").src = url;
 
+        let html_a2 = '<p>';
+        if (data.titlescount > 0){
+          html_a2 += '<span class="dataHeading">Title: </span> ' +  data.title + '\n';
+        } if (data.dated){
+          html_a2 += '<span class="dataHeading">Dated: </span> ' + data.dated + '\n';
+
+        } if (data.accessionyear){
+          html_a2 += '<span class="dataHeading">Accession Year: </span> ' + data.accessionyear;
+        }
+        html_a2 += '</p>';
+
+      
+
+        let html_a3 = '<p>';
+        if(data.division){
+          html_a3 += '<span class="dataHeading">Division: </span> ' + data.division + '\n';
+        }if (data.century){
+          html_a3 += '<span class="dataHeading">Century: </span> ' + data.century + '\n';
+        }if (data.culture){
+          html_a3 += '<span class="dataHeading">Culture: </span> ' + data.culture + '\n';
+        } if (data.classification){
+          html_a3 += '<span class="dataHeading">Classification: </span> ' + data.classification;
+        }
+        html_a3 += '</p>';
+        
         //Parse data, display and store data for reference later
-        /*document.getElementById("obj_txt_1").textContent = selected_object_data.culture;*/
+        let data_texts = document.querySelectorAll('.dataText');
+        data_texts[0].innerHTML = html_a2;
+        data_texts[1].innerHTML = html_a3;
+
+        for(let i =0; i< data_texts.length; i++){
+          
+          console.log(`hey my class is ${data_texts[i].className}`);
+        }
+        /*document.getElementById("obj_txt_1").textContent = selected_object_data.objectnumber;*/
 
 
       }
