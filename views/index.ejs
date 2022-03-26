@@ -51,7 +51,6 @@
       
         visibility: hidden;
         opacity: 0;
-        transition: opacity 0.3s ease-in; 
         height: 0%; /* start as not taking up any space so objects are clickable beneath*/
         overflow: hidden;
         width: 100%; /* cover the page width-wise*/
@@ -67,9 +66,9 @@
         grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: 1fr 1fr 1fr;
         grid-template-areas:
-          "a a a"
-          "b c c"
-          "d c c";
+          "a1 a2 a3"
+          "b1 b2 b3"
+          "c1 c2 c2";
 
       }
 
@@ -95,7 +94,7 @@
         grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: 1fr 1fr 1fr;
         column-gap: 1%;
-        row-gap: 1%;
+        row-gap: 5%;
         grid-template-areas:
           "a1 a2 a3"
           "b1 b2 b3"
@@ -150,7 +149,8 @@
         overflow-wrap: break-word;
         max-height: 33vh;
         margin-top: 20px;
-        overflow-y: hidden;
+        /*overflow-y: hidden;*/
+        overflow-y: scroll;
       }
 
       .b1{
@@ -260,10 +260,15 @@
   <body>
     
     <div id="images_overlay">
-      <div id="aaa"></div>
-      <p id="imageGalleryTxt"></p>
-      <div id="color"></div>
-      <img id="image_magnify" src=""/>
+      <div class='a1'></div>
+      <div class='a2'></div>
+      <div class='a3'></div>
+      <div class='b1 dataText'></div>
+      <div class='b2' onclick="imagesOverlayOff()"></div>
+      <div class='b3'></div>
+      <div class='c1'></div>
+      <div class='c2'></div>
+      <div class='c3'></div>
     </div>
 
     <div id="object_overlay" onclick="overlay_off()">
@@ -272,12 +277,12 @@
       <div class="dataText a3">parse JSON and stick some other data here</div>
       <div class="dataText b1">parse JSON and stick some more data here</div>
 
-      <img id="selected_obj" class="b2" src=""  onclick="imagesOverlay()" onmouseenter="svgHover()" onmouseleave="svgGone()"/>
+      <img id="selected_obj" class="b2" src=""  onclick="imagesOverlayOn()" onmouseenter="svgHover()" onmouseleave="svgGone()"/>
   
       <!-- ICON -->
      <svg id="icon" class="b2" version="1.1"
       width="100" height="100"
-      xmlns="http://www.w3.org/2000/svg" onmouseenter="svgHover()">
+      xmlns="http://www.w3.org/2000/svg" onmouseenter="svgHover()" onclick="imagesOverlayOn()">
         <g id="icon_stackRect" transform="scale(0.5) translate(50,50)">
           <polygon points="0, 75 50, 50 100, 75 50, 100"/>
           <polygon points="0, 50 50, 25 100, 50 50, 75"/>
@@ -304,7 +309,7 @@
     </div>
     <script>
       /*global variable to store JSON for object selected */
-      //let selected_object_data;
+      let json_data_selectedObj;
       /*Attach the selectArtObject function to every image displayed*/
       let images = document.querySelectorAll(".art_img");
       for (let i=0; i< images.length; i++){
@@ -328,30 +333,37 @@
 
             
             //Save data 
-            let selected_object_data = data;
+            json_data_selectedObj = data;
+            //let selected_object_data = data;
 
             /*PROCESS AND SHOW JSON DATA IN A GRID OVERLAY*/
             //STORE IIIF _URLs and Color Info for Second Page of Overlay
 
 
-            base_iiif_uri = data.images[0].iiifbaseuri;
+            //base_iiif_uri = data.images[0].iiifbaseuri;
             //console.log(`base uri is ${base_iiif_uri}`);
-            let img_url = base_iiif_uri + "/full/max/0/default.jpg";
+            //let img_url = base_iiif_uri + "/full/max/0/default.jpg";
             //console.log(`image url is ${img_url}`);
             //document.getElementById("selected_obj").src = img_url;
 
-            overlay_on(img_url, selected_object_data);
+            //overlay_on(img_url, selected_object_data);
+            overlay_on(json_data_selectedObj);
 
           }).catch(error=> console.error(error));
     
       }
 
-      function overlay_on(url, data){
+      function overlay_on(data){
+        base_iiif_uri = data.images[0].iiifbaseuri;
+        //console.log(`base uri is ${base_iiif_uri}`);
+        let img_url = base_iiif_uri + "/full/max/0/default.jpg";
+        
         /* turn on the div */
         document.getElementById("object_overlay").style.height = '100%';
         document.getElementById("object_overlay").style.visibility = 'visible';
         document.getElementById("object_overlay").style.opacity = '1';
-        document.getElementById("selected_obj").src = url;
+        //document.getElementById("selected_obj").src = url;
+        document.getElementById("selected_obj").src = img_url;
 
         
         let html_a2 = '<p>';
@@ -478,7 +490,7 @@
         html_c2 += '</p>';
 
         //Place populated html on grid
-        let data_texts = document.querySelectorAll('.dataText');
+        let data_texts = document.querySelectorAll('#object_overlay > .dataText');
         data_texts[0].innerHTML = html_a2;
         data_texts[1].innerHTML = html_a3;
         data_texts[2].innerHTML = html_b1;
@@ -505,6 +517,26 @@
 
       }
 
+
+      function imagesOverlayOn(){
+        
+        /*turn off first overlay*/
+        overlay_off();
+
+        /* turn on the images overlay */
+        document.getElementById("images_overlay").style.height = '100%';
+        document.getElementById("images_overlay").style.visibility = 'visible';
+        document.getElementById("images_overlay").style.opacity = '1';
+
+      }
+
+      function imagesOverlayOff(){
+        document.getElementById("images_overlay").style.height = '0%';
+        document.getElementById("images_overlay").style.visibility = 'hidden';
+        document.getElementById("images_overlay").style.opacity = '0';
+        overlay_on(json_data_selectedObj);
+      }
+
       function svgHover(){
         /*document.getElementById("selected_obj").style.filter = "grayscale(60) blur(3px)";*/
         document.getElementById("selected_obj").style.filter = "grayscale(90) brightness(30%) blur(1px)";
@@ -522,10 +554,7 @@
         document.getElementById("icon").style.opacity = '0';
       }
 
-      function imagesOverlay(){
-
-
-      }
+    
 
     </script>
   </body>
