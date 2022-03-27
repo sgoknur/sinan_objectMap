@@ -65,10 +65,12 @@
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: 1fr 1fr 1fr;
+        column-gap: 1%;
+        row-gap: 2%;
         grid-template-areas:
           "a1 a2 a3"
           "b1 b2 b3"
-          "c1 c2 c2";
+          "c1 c2 c3";
 
       }
 
@@ -174,7 +176,6 @@
         justify-self: left;
         margin-right: 20px;
         max-width: 33vw;
-        overflow-wrap: break-word;
         max-height: 33vh;
         /*MAKE A DECISION IS OVERFLOW HIDDEN OR SCROLL BETTER ?!?!*/
         overflow-y: scroll;
@@ -182,7 +183,6 @@
 
       .c1{
         grid-area: c1;
-        align-self: center;
         justify-self: left;
         margin-left: 20px;
         max-width: 33vw;
@@ -194,10 +194,18 @@
 
       .c2{
         grid-area: c2;
-        align-self: center;
         justify-self: center;
         max-width: 33vw;
         overflow-wrap: break-word;
+        max-height: 33vh;
+        overflow-y: hidden;
+        margin-bottom: 20px;
+      }
+
+      .c3{
+        grid-area: c3;
+        justify-self: center;
+        max-width: 33vw;
         max-height: 33vh;
         overflow-y: hidden;
         margin-bottom: 20px;
@@ -209,6 +217,13 @@
         max-width: 33vw;
         max-height: 33vh;
         transition: all 2s ease;
+      }
+
+      .overlayImg{
+        align-self: center;
+        justify-self: center;
+        max-width: 30vw;
+        max-height: 30vh;
       }
 
       a:link,
@@ -260,15 +275,15 @@
   <body>
     
     <div id="images_overlay">
-      <div class='a1'></div>
-      <div class='a2'></div>
-      <div class='a3'></div>
+      <img id='centerImage' class='b2 overlayImg' src='' onclick="imagesOverlayOff()" />
+      <img class='a1 overlayImg' src=''/>
+      <img class='a2 overlayImg' src=''/>
+      <img class='a3 overlayImg' src=''/>
       <div class='b1 dataText'></div>
-      <div class='b2' onclick="imagesOverlayOff()"></div>
-      <div class='b3'></div>
-      <div class='c1'></div>
-      <div class='c2'></div>
-      <div class='c3'></div>
+      <div id="chart" class='b3'></div>
+      <img class='overlayImg c1' src=''/>
+      <img class='overlayImg c2' src=''/>
+      <img class='overlayImg c3' src=''/>
     </div>
 
     <div id="object_overlay" onclick="overlay_off()">
@@ -320,8 +335,6 @@
       function selectArtObject(){
         console.log(this.id);
 
-        let base_iiif_uri = "";
-
           fetch(`http://localhost:3000/object/${this.id}`).then(response => {
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
@@ -354,7 +367,7 @@
       }
 
       function overlay_on(data){
-        base_iiif_uri = data.images[0].iiifbaseuri;
+        let base_iiif_uri = data.images[0].iiifbaseuri;
         //console.log(`base uri is ${base_iiif_uri}`);
         let img_url = base_iiif_uri + "/full/max/0/default.jpg";
         
@@ -527,6 +540,24 @@
         document.getElementById("images_overlay").style.height = '100%';
         document.getElementById("images_overlay").style.visibility = 'visible';
         document.getElementById("images_overlay").style.opacity = '1';
+        
+        let b1_img_html = '<p>';
+        b1_img_html += 'gallery floor: ' + json_data_selectedObj.gallery.floor +'\n';
+        b1_img_html += 'gallery number: ' + json_data_selectedObj.gallery.gallerynumber + '\n';
+        b1_img_html += 'gallery name:' + json_data_selectedObj.gallery.name + '\n';
+        b1_img_html += 'gallery theme: ' + json_data_selectedObj.gallery.theme;
+        b1_img_html += '</p>';
+      
+        document.querySelectorAll('#images_overlay > .dataText')[0].innerHTML = b1_img_html;
+        
+        let count = json_data_selectedObj.imagecount;
+        console.log(`there are ${count} images for this object`);
+
+        let xtraImages = document.querySelectorAll('.overlayImg');
+        for(let i=0; i<count; i++){
+          xtraImages[i].src = json_data_selectedObj.images[i].iiifbaseuri + "/full/max/0/default.jpg";
+
+        }
 
       }
 
@@ -534,6 +565,7 @@
         document.getElementById("images_overlay").style.height = '0%';
         document.getElementById("images_overlay").style.visibility = 'hidden';
         document.getElementById("images_overlay").style.opacity = '0';
+
         overlay_on(json_data_selectedObj);
       }
 
