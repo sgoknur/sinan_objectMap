@@ -6,6 +6,11 @@
     <meta name="keywords" content="HTML, CSS, javaScript, Node, Express" />
     <meta name="author" content="sinan goknur" />
     <title>Object Map 2022</title>
+
+    <!-- Chart.js CDN-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    
     <style>
       /*@import url('https://fonts.googleapis.com/css2?family=League+Gothic&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');*/
       @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500&family=Signika+Negative:wght@300;400;500;600&display=swap');
@@ -79,7 +84,6 @@
       
         visibility: hidden;
         opacity: 0;
-        transition: opacity 0.5s ease-in; 
         height: 0%; /* start as not taking up any space so objects are clickable beneath*/
         overflow: hidden;
         width: 100%; /* cover the page width-wise*/
@@ -129,6 +133,17 @@
 
       .dataHeading{
         color: aqua;
+      }
+
+      .a1{
+        grid-area: a1;
+        align-self: center;
+        justify-self: center;
+        max-width: 33vw;
+        overflow-wrap: break-word;
+        max-height: 33vh;
+        margin-top: 20px;
+        overflow-y: hidden;
       }
 
       .a2{
@@ -226,6 +241,12 @@
         max-height: 30vh;
       }
 
+      #chart{
+        align-self: center;
+        justify-self: center;
+        overflow: scroll;
+      }
+
       a:link,
       a:visited,
       a:active,
@@ -274,13 +295,13 @@
   </head>
   <body>
     
-    <div id="images_overlay">
-      <img id='centerImage' class='b2 overlayImg' src='' onclick="imagesOverlayOff()" />
+    <div id="images_overlay" onclick="imagesOverlayOff(this)">
+      <img id='centerImage' class='b2 overlayImg' src='' onclick="imagesOverlayOff(this)" />
       <img class='a1 overlayImg' src=''/>
       <img class='a2 overlayImg' src=''/>
       <img class='a3 overlayImg' src=''/>
       <div class='b1 dataText'></div>
-      <div id="chart" class='b3'></div>
+      <canvas width='350' height='350' class='b3' id="chart"></canvas>
       <img class='overlayImg c1' src=''/>
       <img class='overlayImg c2' src=''/>
       <img class='overlayImg c3' src=''/>
@@ -325,6 +346,10 @@
     <script>
       /*global variable to store JSON for object selected */
       let json_data_selectedObj;
+
+      /*to be used for the chart object*/
+      let myChart;
+
       /*Attach the selectArtObject function to every image displayed*/
       let images = document.querySelectorAll(".art_img");
       for (let i=0; i< images.length; i++){
@@ -360,13 +385,22 @@
             //document.getElementById("selected_obj").src = img_url;
 
             //overlay_on(img_url, selected_object_data);
-            overlay_on(json_data_selectedObj);
+            overlay_on(json_data_selectedObj, true);
 
           }).catch(error=> console.error(error));
     
       }
 
-      function overlay_on(data){
+      function overlay_on(data, transitionBoolean){
+
+        if(transitionBoolean){
+          console.log("Boolean TRUE");
+          document.getElementById("object_overlay").style.transition = "opacity 0.5s ease-in";
+        }else{
+          console.log("Boolean FALSE");
+          document.getElementById("object_overlay").style.transition = '';
+        }
+
         let base_iiif_uri = data.images[0].iiifbaseuri;
         //console.log(`base uri is ${base_iiif_uri}`);
         let img_url = base_iiif_uri + "/full/max/0/default.jpg";
@@ -530,9 +564,9 @@
 
       }
 
-
+    
       function imagesOverlayOn(){
-        
+     
         /*turn off first overlay*/
         overlay_off();
 
@@ -541,11 +575,17 @@
         document.getElementById("images_overlay").style.visibility = 'visible';
         document.getElementById("images_overlay").style.opacity = '1';
         
+        '<span class="dataHeading">title: </span> '
         let b1_img_html = '<p>';
-        b1_img_html += 'gallery floor: ' + json_data_selectedObj.gallery.floor +'\n';
-        b1_img_html += 'gallery number: ' + json_data_selectedObj.gallery.gallerynumber + '\n';
-        b1_img_html += 'gallery name:' + json_data_selectedObj.gallery.name + '\n';
-        b1_img_html += 'gallery theme: ' + json_data_selectedObj.gallery.theme;
+          if (json_data_selectedObj.gallery.gallerynumber){
+            b1_img_html += '<span class="dataHeading"> gallerynumber: </span>' + json_data_selectedObj.gallery.gallerynumber + '\n';
+          }if (json_data_selectedObj.gallery.floor){
+            b1_img_html += '<span class="dataHeading"> [gallery] floor: </span>' + json_data_selectedObj.gallery.floor +'\n';
+          }if (json_data_selectedObj.gallery.name){
+            b1_img_html += '<span class="dataHeading"> [gallery] name: </span>' + json_data_selectedObj.gallery.name + '\n';
+          }if (json_data_selectedObj.gallery.theme){
+            b1_img_html += '<span class="dataHeading"> [gallery] theme: </span>' + json_data_selectedObj.gallery.theme;
+          }
         b1_img_html += '</p>';
       
         document.querySelectorAll('#images_overlay > .dataText')[0].innerHTML = b1_img_html;
@@ -555,18 +595,60 @@
 
         let xtraImages = document.querySelectorAll('.overlayImg');
         for(let i=0; i<count; i++){
-          xtraImages[i].src = json_data_selectedObj.images[i].iiifbaseuri + "/full/max/0/default.jpg";
-
+          if(i < xtraImages.length){
+            xtraImages[i].src = json_data_selectedObj.images[i].iiifbaseuri + "/full/max/0/default.jpg";
+          }
+         
         }
 
+        let canvas = document.getElementById('chart');
+        let ctx = canvas.getContext('2d');
+
+        let clr_count = json_data_selectedObj.colorcount;
+        let chrt_data = [];
+        let colors_chrt = [];
+        for (let i=0; i<clr_count; i++){
+          chrt_data.push(json_data_selectedObj.colors[i].percent);
+          colors_chrt.push(json_data_selectedObj.colors[i].color);
+        }
+
+        let data = {
+          labels: '',
+          datasets: [{
+            label: '',
+            data: chrt_data,
+            backgroundColor: colors_chrt,
+            borderColor: 'rgba(255,255,255,0.3)',
+          }]};
+
+        let config = {
+          type: 'doughnut',
+          data: data,
+          options: {}
+        };
+
+        myChart = new Chart(
+          document.getElementById('chart'), config );
       }
 
-      function imagesOverlayOff(){
+      function imagesOverlayOff(x){
+        
         document.getElementById("images_overlay").style.height = '0%';
         document.getElementById("images_overlay").style.visibility = 'hidden';
         document.getElementById("images_overlay").style.opacity = '0';
+        //erase images
+        let rmvImages = document.querySelectorAll('.overlayImg');
+        for(let i=0; i<rmvImages.length; i++){
+          rmvImages[i].src = '';
 
-        overlay_on(json_data_selectedObj);
+        }
+        //remove chart
+        myChart.destroy();
+        
+        if (x.id ===  'centerImage'){
+          overlay_on(json_data_selectedObj, false);
+        }
+       
       }
 
       function svgHover(){
