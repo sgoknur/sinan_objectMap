@@ -26,7 +26,7 @@
         font-family: "Open Sans", sans-serif;
       }
 
-      #icon{
+      .icon{
         z-index: 4;
         align-self: center;
         justify-self: center;
@@ -44,6 +44,19 @@
         fill: none;
         stroke: white; 
         stroke-width: 8px;
+      }
+
+      #icon_curlyLeft{
+        fill: white;
+        stroke: white;
+        stroke-width: 5px;
+      }
+
+      #icon_curlyRight{
+        fill: white;
+        stroke: white;
+        stroke-width: 5px;
+      }
       }
 
       .coma{
@@ -164,10 +177,10 @@
         margin-right: 20px;
         max-width: 33vw;
         overflow-wrap: break-word;
-        max-height: 33vh;
+        max-height: 36vh;
         margin-top: 20px;
-        /*overflow-y: hidden;*/
-        overflow-y: scroll;
+        /*overflow-y: scroll;*/
+        overflow-y: hidden;
       }
 
       .b1{
@@ -193,7 +206,7 @@
         max-width: 33vw;
         max-height: 33vh;
         /*MAKE A DECISION IS OVERFLOW HIDDEN OR SCROLL BETTER ?!?!*/
-        overflow-y: scroll;
+        overflow-y: hidden;
       }
 
       .c1{
@@ -237,8 +250,8 @@
       .overlayImg{
         align-self: center;
         justify-self: center;
-        max-width: 30vw;
-        max-height: 30vh;
+        max-width: 32vw;
+        max-height: 32vh;
       }
 
       #chart{
@@ -296,7 +309,22 @@
   <body>
     
     <div id="images_overlay" onclick="imagesOverlayOff(this)">
-      <img id='centerImage' class='b2 overlayImg' src='' onclick="imagesOverlayOff(this)" />
+      <img id='centerImage' class='b2 overlayImg' src='' onclick="imagesOverlayOff(this)" onmouseenter="svgHover(this)" onmouseleave="svgGone(this)" />
+      
+      <!-- ICON -->
+     <svg id="icon_2" class="b2 icon" version="1.1"
+      width="100" height="100"
+      xmlns="http://www.w3.org/2000/svg" onmouseenter="svgHover(this)" onclick="imagesOverlayOff(this)">
+        <g id="icon_curlyLeft" transform="scale(0.25) translate(95,100)">
+          <path class="fil0" d="M0.0240945 91.8181l0 17.0428c4.52776,0.108425 8.23831,1.57016 11.1015,4.38319 2.83713,2.78492 4.74059,6.56173 5.70638,11.3043 0.933661,4.77874 1.44768,12.9789 1.4778,24.6045 0.0622441,11.6617 0.240945,19.2917 0.544134,23.0042 0.53811,5.91921 1.50791,10.6237 2.95559,14.1535 1.44768,3.52984 3.22866,6.34488 5.34295,8.44913 2.14039,2.14039 4.85504,3.74669 8.14394,4.85102 2.23276,0.783071 5.88709,1.17661 10.9509,1.17661l4.95343 0 0 -16.4043 -2.74677 0c-6.12602,0 -10.1699,-1.31717 -12.1918,-3.91736 -1.99181,-2.60823 -2.98772,-8.4913 -2.98772,-17.6191 0,-17.3982 -0.271063,-28.4556 -0.815197,-33.1239 -0.935669,-7.7022 -2.83311,-13.9065 -5.64012,-18.5467 -2.83913,-4.59602 -6.85087,-8.19815 -12.0392,-10.8004 6.78862,-3.81496 11.5553,-8.87882 14.3322,-15.1916 2.77689,-6.31276 4.16232,-16.9384 4.16232,-31.9131 0,-13.5833 0.12248,-21.681 0.421654,-24.3555 0.425669,-4.66831 1.57016,-7.91303 3.49972,-9.77031 1.90346,-1.81913 5.67626,-2.74677 11.2581,-2.74677l2.74677 0 0 -16.3983 -4.95343 0c-5.7626,0 -9.95504,0.534094 -12.5512,1.67457 -3.7728,1.53402 -6.87697,4.09807 -9.35067,7.7022 -2.4737,3.63827 -4.1061,8.19815 -4.82894,13.6937 -0.724843,5.52366 -1.14449,14.5491 -1.20673,27.0601 -0.0301181,12.5532 -0.544134,21.1831 -1.4778,25.9618 -0.965787,4.77874 -2.86925,8.55756 -5.70638,11.3405 -2.86323,2.7789 -6.57378,4.24063 -11.1015,4.3852z"/>
+        </g>
+        <line x1="45" y1="70" x2="55" y2="30" stroke="white" stroke-width="5px"/>
+        <g id="icon_curlyRight" transform="scale(0.25) translate(255,100)">
+          <path class="fil0" d="M51.2008 91.8181l0 17.0428c-4.52776,0.108425 -8.23831,1.57016 -11.1015,4.38319 -2.83713,2.78492 -4.74059,6.56173 -5.70638,11.3043 -0.933661,4.77874 -1.44768,12.9789 -1.4778,24.6045 -0.0622441,11.6617 -0.240945,19.2917 -0.544134,23.0042 -0.53811,5.91921 -1.50791,10.6237 -2.95559,14.1535 -1.44768,3.52984 -3.22866,6.34488 -5.34295,8.44913 -2.14039,2.14039 -4.85504,3.74669 -8.14394,4.85102 -2.23276,0.783071 -5.88709,1.17661 -10.9509,1.17661l-4.95343 0 0 -16.4043 2.74677 0c6.12602,0 10.1699,-1.31717 12.1918,-3.91736 1.99181,-2.60823 2.98772,-8.4913 2.98772,-17.6191 0,-17.3982 0.271063,-28.4556 0.815197,-33.1239 0.935669,-7.7022 2.83311,-13.9065 5.64012,-18.5467 2.83913,-4.59602 6.85087,-8.19815 12.0392,-10.8004 -6.78862,-3.81496 -11.5553,-8.87882 -14.3322,-15.1916 -2.77689,-6.31276 -4.16232,-16.9384 -4.16232,-31.9131 0,-13.5833 -0.12248,-21.681 -0.421654,-24.3555 -0.425669,-4.66831 -1.57016,-7.91303 -3.49972,-9.77031 -1.90346,-1.81913 -5.67626,-2.74677 -11.2581,-2.74677l-2.74677 0 0 -16.3983 4.95343 0c5.7626,0 9.95504,0.534094 12.5512,1.67457 3.7728,1.53402 6.87697,4.09807 9.35067,7.7022 2.4737,3.63827 4.1061,8.19815 4.82894,13.6937 0.724843,5.52366 1.14449,14.5491 1.20673,27.0601 0.0301181,12.5532 0.544134,21.1831 1.4778,25.9618 0.965787,4.77874 2.86925,8.55756 5.70638,11.3405 2.86323,2.7789 6.57378,4.24063 11.1015,4.3852z"/>
+        </g>
+        <circle id="icon_circle" cx="50" cy="50" r="45"/>
+      </svg>
+
       <img class='a1 overlayImg' src=''/>
       <img class='a2 overlayImg' src=''/>
       <img class='a3 overlayImg' src=''/>
@@ -313,12 +341,12 @@
       <div class="dataText a3">parse JSON and stick some other data here</div>
       <div class="dataText b1">parse JSON and stick some more data here</div>
 
-      <img id="selected_obj" class="b2" src=""  onclick="imagesOverlayOn()" onmouseenter="svgHover()" onmouseleave="svgGone()"/>
+      <img id="selected_obj" class="b2" src=""  onclick="imagesOverlayOn()" onmouseenter="svgHover(this)" onmouseleave="svgGone(this)"/>
   
       <!-- ICON -->
-     <svg id="icon" class="b2" version="1.1"
+     <svg id="icon" class="b2 icon" version="1.1"
       width="100" height="100"
-      xmlns="http://www.w3.org/2000/svg" onmouseenter="svgHover()" onclick="imagesOverlayOn()">
+      xmlns="http://www.w3.org/2000/svg" onmouseenter="svgHover(this)" onclick="imagesOverlayOn()">
         <g id="icon_stackRect" transform="scale(0.5) translate(50,50)">
           <polygon points="0, 75 50, 50 100, 75 50, 100"/>
           <polygon points="0, 50 50, 25 100, 50 50, 75"/>
@@ -445,7 +473,7 @@
         }if (data.description){
           html_a3 += 'description: ' + data.description + '\n';
         }if (data.provenance){
-          html_a3 += 'provenance: ' + data.provenance;
+          html_a3 += 'provenance: ' + data.provenance.replace(/(\r\n|\n|\r)/gm, "");
         }
         html_a3 += '</p>';
         
@@ -545,13 +573,6 @@
         data_texts[4].innerHTML = html_c1;
         data_texts[5].innerHTML = html_c2;
 
-        for(let i =0; i< data_texts.length; i++){
-          
-          console.log(`hey my class is ${data_texts[i].className}`);
-        }
-        /*document.getElementById("obj_txt_1").textContent = selected_object_data.objectnumber;*/
-
-
       }
 
      
@@ -645,27 +666,41 @@
         //remove chart
         myChart.destroy();
         
-        if (x.id ===  'centerImage'){
+        if ((x.id ===  'centerImage') || (x.id === 'icon_2')){
           overlay_on(json_data_selectedObj, false);
         }
        
       }
 
-      function svgHover(){
+      function svgHover(x){
         /*document.getElementById("selected_obj").style.filter = "grayscale(60) blur(3px)";*/
-        document.getElementById("selected_obj").style.filter = "grayscale(90) brightness(30%) blur(1px)";
-        document.getElementById("selected_obj").style.cursor = "pointer";
-        document.getElementById("icon").style.opacity = '1';
-        document.getElementById("icon").style.cursor = "pointer";
+
+        if ((x.id === 'icon') || (x.id === 'selected_obj')){
+          document.getElementById("selected_obj").style.filter = "grayscale(90) brightness(30%) blur(1px)";
+          document.getElementById("selected_obj").style.cursor = "pointer";
+          document.getElementById("icon").style.opacity = '1';
+          document.getElementById("icon").style.cursor = "pointer";
+        } else {
+          document.getElementById("centerImage").style.filter = "grayscale(90) brightness(30%) blur(1px)";
+          document.getElementById("centerImage").style.cursor = "pointer";
+          document.getElementById("icon_2").style.opacity = '1';
+          document.getElementById("icon_2").style.cursor = "pointer";
+        }
+        
 
 
         /*outline: 3px solid white;*/
         /*box-shadow: 0px 0px 10px 4px lightgoldenrodyellow;*/
       }
 
-      function svgGone(){
-        document.getElementById("selected_obj").style.filter = "grayscale(0) blur(0px)";
-        document.getElementById("icon").style.opacity = '0';
+      function svgGone(x){
+        if ((x.id === 'icon') || (x.id === 'selected_obj')){
+          document.getElementById("selected_obj").style.filter = "grayscale(0) blur(0px)";
+          document.getElementById("icon").style.opacity = '0';
+        }else{
+          document.getElementById("centerImage").style.filter = "grayscale(0) blur(0px)";
+          document.getElementById("icon_2").style.opacity = '0';
+        }
       }
 
     
