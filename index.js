@@ -37,7 +37,7 @@ function art_object(object_ID, ids_ID, iiif_baseuri) {
 
 let display_objects = [];
 
-const thumbnailSize = 40;
+const thumbnailSize = 100;
 
 function processData(api_data, art_obj_array = []) {
   for (let i = 0; i < api_data.length; i++) {
