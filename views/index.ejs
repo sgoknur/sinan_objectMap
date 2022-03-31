@@ -24,8 +24,10 @@
       body {
         background-color: black;
         font-family: "Open Sans", sans-serif;
-        font-size: 200%;
-        overflow: hidden;
+        /*UNCOMMENT THIS FOR INSTALLATION COMMENTING OUT FOR TESTING*/
+        /*font-size: 200%;/
+        /*UNCOMMENT THIS FOR INSTALLATION COMMENTING OUT FOR TESTING*/
+        /* overflow: hidden;*/
       }
 
       .icon{
@@ -487,7 +489,7 @@
         if(data.department){
           html_b1 += '<span class="dataHeading">department: </span> ' + data.department + '\n';
         }if(data.objectnumber){
-          html_b1 += '<span class="dataHeading">objectnumber: </span> ' + data.objectnumber + '\n';
+          html_b1 += 'objectnumber: ' + data.objectnumber + '\n';
         }if(data.objectid){
           html_b1 += '<span class="dataHeading">objectid: </span> ' + data.objectid + '\n';
         }
@@ -508,7 +510,7 @@
         } if (data.worktype){
           html_b3 += 'worktype: ' + data.worktype + '\n';
         } if (data.dimensions) {
-          html_b3 += '<span class="dataHeading">dimensions: </span> ' + data.dimensions + '\n';
+          html_b3 += 'dimensions: ' + data.dimensions + '\n';
         } if (data.medium) {
           html_b3 += '<span class="dataHeading">medium: </span> ' + data.medium + '\n';
         } 
@@ -549,7 +551,7 @@
 
         let html_c2 = '<p>';
         if(data.verificationlevel){
-          html_c2 += '<span class="dataHeading">verificationlevel: </span> ' + data.verificationlevel + '\n';
+          html_c2 += 'verificationlevel: ' + data.verificationlevel + '\n';
         }if (data.verificationleveldescription){
           html_c2 += 'verificationleveldescription: ' + data.verificationleveldescription + '\n';
         }if (data.accesslevel){
@@ -561,9 +563,9 @@
         }if (data.imagecount){
           html_c2 += '<span class="dataHeading">imagecount: </span> ' + data.imagecount + '\n';
         }if (data.datebegin){
-          html_c2 += '<span class="dataHeading">datebegin: </span> ' + data.datebegin + '\n';
+          html_c2 += 'datebegin: ' + data.datebegin + '\n';
         }if (data.dateend){
-          html_c2 += '<span class="dataHeading">dateend: </span> ' + data.dateend + '\n';
+          html_c2 += 'dateend: ' + data.dateend + '\n';
         }if (data.copyright){
           html_c2 += 'copyright: ' + data.copyright;
         }
@@ -601,16 +603,15 @@
         document.getElementById("images_overlay").style.visibility = 'visible';
         document.getElementById("images_overlay").style.opacity = '1';
         
-        '<span class="dataHeading">title: </span> '
         let b1_img_html = '<p>';
           if (json_data_selectedObj.gallery.gallerynumber){
             b1_img_html += '<span class="dataHeading"> gallerynumber: </span>' + json_data_selectedObj.gallery.gallerynumber + '\n';
           }if (json_data_selectedObj.gallery.floor){
             b1_img_html += '<span class="dataHeading"> [gallery] floor: </span>' + json_data_selectedObj.gallery.floor +'\n';
           }if (json_data_selectedObj.gallery.name){
-            b1_img_html += '<span class="dataHeading"> [gallery] name: </span>' + json_data_selectedObj.gallery.name + '\n';
+            b1_img_html += '[gallery] name: ' + json_data_selectedObj.gallery.name + '\n';
           }if (json_data_selectedObj.gallery.theme){
-            b1_img_html += '<span class="dataHeading"> [gallery] theme: </span>' + json_data_selectedObj.gallery.theme;
+            b1_img_html += '[gallery] theme: ' + json_data_selectedObj.gallery.theme;
           }
         b1_img_html += '</p>';
       

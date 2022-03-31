@@ -20,6 +20,7 @@ app.set("views", path.join(__dirname, "./views"));
 
 //This folder path is needed for re-creating and servicing image URLs to client
 const art_images_folder = "./art_images/";
+const json_data_path = "./static/allData.json";
 
 //Middlewar
 //app.use(express.static(path.join(__dirname, "./art_images")));
@@ -37,7 +38,8 @@ function art_object(object_ID, ids_ID, iiif_baseuri) {
 
 let display_objects = [];
 
-const thumbnailSize = 108;
+//const thumbnailSize = 108;
+const thumbnailSize = 40;
 
 function processData(api_data, art_obj_array = []) {
   for (let i = 0; i < api_data.length; i++) {
@@ -61,6 +63,17 @@ function processData(api_data, art_obj_array = []) {
     `number of objects in art objects array is ${art_obj_array.length}`
   );
   return art_obj_array;
+}
+
+async function writeJSONtoFile(json_data) {
+  const content = JSON.stringify(json_data);
+  try {
+    Fs.writeFileSync("/static/allData.json", content);
+    //file written successfully
+    return true;
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 async function getObject(object_id) {
@@ -189,6 +202,13 @@ app.get(
   asyncHandler(async (req, res, next) => {
     let data = await getAllData(api_url);
     console.log(`RETURNED FROM API CALL WITH DATA ${data.length}`);
+
+    let writeFile = await writeJSONtoFile(data);
+    if (writeFile) {
+      console.log("JSON data written successfully");
+    } else {
+      console.log("something went wrong writing JSON file");
+    }
 
     display_objects = processData(data);
 
