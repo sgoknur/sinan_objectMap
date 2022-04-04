@@ -149,6 +149,7 @@
 
       .dataHeading{
         color: aqua;
+        /*color:  #E2FF00;*/
         cursor: pointer;
       }
 
@@ -289,12 +290,17 @@
         cursor: pointer;
 
         /*outline: 1px solid lightgoldenrodyellow;*/
-        outline: 15px solid #E2FF00;
+        /*outline: 15px solid #E2FF00;*/
+        
         /* in order: x offset, y offset, blur size, spread size, color */
         /* blur size and spread size are optional (they default to 0) */
         /*box-shadow: 0px 0px 8px 15px lightgoldenrodyellow;*/
-        box-shadow: 0px 0px 20px 30px #E2FF00;
+        /*box-shadow: 0px 0px 20px 30px #E2FF00;*/
 
+        outline: 15px solid  #E2FF00;
+        box-shadow: 0px 0px 20px 30px #E2FF00;
+  
+  
         /*this is so that the outline is not obscured by the next element*/
         z-index: 2;
       }
@@ -313,7 +319,7 @@
     <!-- my css-->
     <!--<link href="css/main.css" rel="stylesheet">-->
   </head>
-  <body>
+  <body onload="initialize()">
     
     <div id="images_overlay" onclick="imagesOverlayOff(this)">
       <img id='centerImage' class='b2 overlayImg' src='' onclick="imagesOverlayOff(this)" onmouseenter="svgHover(this)" onmouseleave="svgGone(this)" />
@@ -379,21 +385,84 @@
       <% } %>
     </div>
     <script>
+
+      /*make sure the size for thumbnailSize matches the one set in server side script index.js */
+      const thumbnailSize = 108;
       /*global variable to store JSON for object selected */
       let json_data_selectedObj;
 
       /*to be used for the chart object*/
       let myChart;
 
-      /*Attach the selectArtObject function to every image displayed*/
-      let images = document.querySelectorAll(".art_img");
-      for (let i=0; i< images.length; i++){
-        images[i].addEventListener("click", selectArtObject);
+      let allData = [];
+
+      function initialize(){
+        /*Attach the selectArtObject function to every image displayed*/
+        let images = document.querySelectorAll(".art_img");
+        for (let i=0; i< images.length; i++){
+          images[i].addEventListener("click", selectArtObject);
+        }
+
+        //Read in the JSON
+        fetch('/static/allData.json')
+        .then(response => response.json())
+        .then(data => {
+          console.log(JSON.stringify(data[3].info.pages));
+          //clean and merge the data
+          for(let i=0; i<data.length; i++){
+            allData = allData.concat(data[i].records);
+          }
+          //console.log(`allData has ${allData.length} items`);
+          //console.log(`random object access trying ${allData[1600].images[0].iiifbaseuri}`);
+        });
       }
 
+      // Native sorting from https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore/
+      const sortBy = (key) => {
+        return (a, b) => (a[key] > b[key]) ? 1 : ((b[key] > a[key]) ? -1 : 0);
+      };
+      //use: fruits.concat().sort(sortBy("name"));
+
+      function sortClick(event){
+        //console.log(`SORT IS CLICKED WITH CLASS ${event.target.className} AND WITH TEXT ${event.target.textContent}`);
+        
+        //stop event propagation so that overlay_off does not get triggered
+        event.stopPropagation();
+        
+        
+        let term_sort = event.target.textContent;
+        term_sort = term_sort.slice(0, -2);
+        console.log(`term sort is ${term_sort}`);
+        if (term_sort === 'dated'){
+          term_sort = 'dateend';
+        }
+
+        allData.sort(sortBy(term_sort));
+        //console.log(`first element sorted by ${term_sort} is ${allData[0].term_sort} and laster one is ${allData[1610].term_sort}`);
+       
+        let url_sorted ='';
+        let artGrid_sorted = '';
+        for (let i=0; i< allData.length; i++){
+          url_sorted = allData[i].images[0].iiifbaseuri + "/square/" + thumbnailSize + ",/0/default.jpg";
+          //console.log(`sorted object is ${allData[i].id}`);
+          artGrid_sorted += `<img class="art_img" id=${allData[i].id} src=${url_sorted} onError="this.style.display='none'"/>`;
+        }
+
+        //change the innerHTML of artGrid
+        document.getElementById('artGrid').innerHTML = artGrid_sorted;
+
+        /*onclick="selectArtObject()" somehow did not work so
+        Once again attach the selectArtObject function to every image displayed*/
+        let images = document.querySelectorAll(".art_img");
+        for (let i=0; i< images.length; i++){
+          images[i].addEventListener("click", selectArtObject);
+        }
+      }
+
+      
       /*Fetch JSON based on object ID when object is selected*/
-      function selectArtObject(){
-        console.log(this.id);
+      function selectArtObject(evt){
+        console.log(`selected art object is ${evt.target.id}`);
 
           fetch(`http://localhost:3000/object/${this.id}`).then(response => {
             const contentType = response.headers.get('content-type');
@@ -404,22 +473,9 @@
           }).then(data => {
             //console.log(JSON.stringify(data));
 
-            
-            //Save data 
             json_data_selectedObj = data;
             //let selected_object_data = data;
 
-            /*PROCESS AND SHOW JSON DATA IN A GRID OVERLAY*/
-            //STORE IIIF _URLs and Color Info for Second Page of Overlay
-
-
-            //base_iiif_uri = data.images[0].iiifbaseuri;
-            //console.log(`base uri is ${base_iiif_uri}`);
-            //let img_url = base_iiif_uri + "/full/max/0/default.jpg";
-            //console.log(`image url is ${img_url}`);
-            //document.getElementById("selected_obj").src = img_url;
-
-            //overlay_on(img_url, selected_object_data);
             overlay_on(json_data_selectedObj, true);
 
           }).catch(error=> console.error(error));
@@ -450,19 +506,19 @@
         
         let html_a2 = '<p>';
         if (data.titlescount > 0){
-          html_a2 += '<span class="dataHeading">title: </span> ' +  data.title + '\n';
+          html_a2 += '<span class="dataHeading" onclick="sortClick(event)">title: </span> ' +  data.title + '\n';
         } if (data.people){
-          html_a2 += 'people: ' + '\n' + JSON.stringify(data.people, function (key, value){
+          html_a2 += '<strong>people: </strong>' + '\n' + JSON.stringify(data.people, function (key, value){
             if (value !== null){
               return value;
             } 
           }) + '\n';
         }
         if (data.dated){
-          html_a2 += '<span class="dataHeading">dated: </span> ' + data.dated + '\n';
+          html_a2 += '<span class="dataHeading" onclick="sortClick(event)">dated: </span> ' + data.dated + '\n';
 
         } if (data.accessionyear){
-          html_a2 += '<span class="dataHeading">accessionyear: </span> ' + data.accessionyear;
+          html_a2 += '<span class="dataHeading" onclick="sortClick(event)">accessionyear: </span> ' + data.accessionyear;
         }
         html_a2 += '</p>';
 
@@ -470,54 +526,54 @@
 
         let html_a3 = '<p>';
         if(data.division){
-          html_a3 += '<span class="dataHeading">division: </span> ' + data.division + '\n';
+          html_a3 += '<span class="dataHeading" onclick="sortClick(event)">division: </span> ' + data.division + '\n';
         }if (data.century){
-          html_a3 += '<span class="dataHeading">century: </span> ' + data.century + '\n';
+          html_a3 += '<strong>century: </strong>' + data.century + '\n';
         }if (data.culture){
-          html_a3 += '<span class="dataHeading">culture: </span> ' + data.culture + '\n';
+          html_a3 += '<span class="dataHeading" onclick="sortClick(event)">culture: </span> ' + data.culture + '\n';
         } if (data.classification){
-          html_a3 += '<span class="dataHeading">classification: </span> ' + data.classification + '\n';
+          html_a3 += '<span class="dataHeading" onclick="sortClick(event)">classification: </span> ' + data.classification + '\n';
         }if (data.description){
-          html_a3 += 'description: ' + data.description + '\n';
+          html_a3 += '<strong>description: </strong>' + data.description + '\n';
         }if (data.provenance){
-          html_a3 += 'provenance: ' + data.provenance.replace(/(\r\n|\n|\r)/gm, "");
+          html_a3 += '<strong>provenance: </strong>' + data.provenance.replace(/(\r\n|\n|\r)/gm, "");
         }
         html_a3 += '</p>';
         
 
         let html_b1 = '<p>';
         if(data.department){
-          html_b1 += '<span class="dataHeading">department: </span> ' + data.department + '\n';
+          html_b1 += '<span class="dataHeading" onclick="sortClick(event)">department: </span> ' + data.department + '\n';
         }if(data.objectnumber){
-          html_b1 += 'objectnumber: ' + data.objectnumber + '\n';
+          html_b1 += '<strong>objectnumber: </strong>' + data.objectnumber + '\n';
         }if(data.objectid){
-          html_b1 += '<span class="dataHeading">objectid: </span> ' + data.objectid + '\n';
+          html_b1 += '<span class="dataHeading" onclick="sortClick(event)">objectid: </span> ' + data.objectid + '\n';
         }
         if(data.contact){
-          html_b1 += 'contact: ' + data.contact + '\n';
+          html_b1 += '<strong>contact: </strong>' + data.contact + '\n';
         }if(data.exhibitioncount){
-          html_b1 += '<span class="dataHeading">exhibitioncount: </span> ' + data.exhibitioncount + '\n';
+          html_b1 += '<span class="dataHeading" onclick="sortClick(event)">exhibitioncount: </span> ' + data.exhibitioncount + '\n';
         }if(data.publicationcount){
-          html_b1 += '<span class="dataHeading">publicationcount: </span> ' + data.publicationcount + '\n';
+          html_b1 += '<span class="dataHeading" onclick="sortClick(event)">publicationcount: </span> ' + data.publicationcount + '\n';
         }if(data.creditline){
-          html_b1 += 'creditline: ' + data.creditline;
+          html_b1 += '<strong>creditline: </strong>' + data.creditline;
         }
         html_b1 += '</p>';
 
         let html_b3 = '<p>';
         if (data.colorcount){
-          html_b3 += '<span class="dataHeading">colorcount: </span> ' + data.colorcount + '\n';
+          html_b3 += '<span class="dataHeading" onclick="sortClick(event)">colorcount: </span> ' + data.colorcount + '\n';
         } if (data.worktype){
-          html_b3 += 'worktype: ' + data.worktype + '\n';
+          html_b3 += '<strong>worktype: </strong>' + data.worktype + '\n';
         } if (data.dimensions) {
-          html_b3 += 'dimensions: ' + data.dimensions + '\n';
+          html_b3 += '<strong>dimensions: </strong>' + data.dimensions + '\n';
         } if (data.medium) {
-          html_b3 += '<span class="dataHeading">medium: </span> ' + data.medium + '\n';
+          html_b3 += '<span class="dataHeading" onclick="sortClick(event)">medium: </span> ' + data.medium + '\n';
         } 
         if (data.technique){
-          html_b3 += '<span class="dataHeading">technique: </span> ' + data.technique + '\n';
+          html_b3 += '<span class="dataHeading" onclick="sortClick(event)">technique: </span> ' + data.technique + '\n';
         } if (data.colors){
-          html_b3 += 'colors: ' + '\n' + JSON.stringify(data.colors, function(key, value){
+          html_b3 += '<strong>colors: </strong>' + '\n' + JSON.stringify(data.colors, function(key, value){
             if(key === 'spectrum'){
               return undefined;
             }
@@ -531,19 +587,19 @@
 
         let html_c1 = '<p>';
         if(data.url){
-           html_c1 += 'url: ' + data.url + '\n';
+           html_c1 += '<strong>url: </strong>' + data.url + '\n';
         } if (data.primaryimageurl){
-          html_c1 += 'primaryimageurl: ' + data.primaryimageurl + '\n';
+          html_c1 += '<strong>primaryimageurl: </strong>' + data.primaryimageurl + '\n';
         } if (data.rank){
-          html_c1 += '<span class="dataHeading">rank: </span> ' + data.rank + '\n';
+          html_c1 += '<span class="dataHeading" onclick="sortClick(event)">rank: </span> ' + data.rank + '\n';
         }if (data.totalpageviews){
-          html_c1 += 'totalpageviews: ' + data.totalpageviews + '\n';
+          html_c1 += '<strong>totalpageviews: </strong>' + data.totalpageviews + '\n';
         } if (data.lastupdate){
-          html_c1 += 'lastupdate: ' + data.lastupdate + '\n';
+          html_c1 += '<strong>lastupdate: </strong>' + data.lastupdate + '\n';
         } if (data.dateoffirstpageview){
-          html_c1 += 'dateoffirstpageview: ' + data.dateoffirstpageview + '\n';
+          html_c1 += '<strong>dateoffirstpageview: </strong>' + data.dateoffirstpageview + '\n';
         } if (data.dateoflastpageview){
-          html_c1 += 'dateoflastpageview: ' + data.dateoflastpageview;
+          html_c1 += '<strong>dateoflastpageview: </strong>' + data.dateoflastpageview;
         } /*if (data.images){
           html_c1 += 'images: ' + JSON.stringify(data.images);
         }*/
@@ -551,23 +607,23 @@
 
         let html_c2 = '<p>';
         if(data.verificationlevel){
-          html_c2 += 'verificationlevel: ' + data.verificationlevel + '\n';
+          html_c2 += '<strong>verificationlevel: </strong>' + data.verificationlevel + '\n';
         }if (data.verificationleveldescription){
-          html_c2 += 'verificationleveldescription: ' + data.verificationleveldescription + '\n';
+          html_c2 += '<strong>verificationleveldescription: </strong>' + data.verificationleveldescription + '\n';
         }if (data.accesslevel){
           if (data.accesslevel > 0){
-            html_c2 += 'accesslevel: public ' + '\n';
+            html_c2 += '<strong>accesslevel:</strong> public' + '\n';
           }else {
-            html_c2 += 'accesslevel: restricted' + '\n';
+            html_c2 += '<strong>accesslevel:</strong> restricted' + '\n';
           }
         }if (data.imagecount){
-          html_c2 += '<span class="dataHeading">imagecount: </span> ' + data.imagecount + '\n';
+          html_c2 += '<span class="dataHeading" onclick="sortClick(event)">imagecount: </span> ' + data.imagecount + '\n';
         }if (data.datebegin){
-          html_c2 += 'datebegin: ' + data.datebegin + '\n';
+          html_c2 += '<strong>datebegin: </strong>' + data.datebegin + '\n';
         }if (data.dateend){
-          html_c2 += 'dateend: ' + data.dateend + '\n';
+          html_c2 += '<strong>dateend: </strong>' + data.dateend + '\n';
         }if (data.copyright){
-          html_c2 += 'copyright: ' + data.copyright;
+          html_c2 += '<strong>copyright: </strong>' + data.copyright;
         }
         html_c2 += '</p>';
 
@@ -585,6 +641,7 @@
      
 
       function overlay_off(){
+
         document.getElementById("object_overlay").style.height = '0%';
         document.getElementById("object_overlay").style.visibility = 'hidden';
         document.getElementById("object_overlay").style.opacity = '0';
@@ -609,9 +666,9 @@
           }if (json_data_selectedObj.gallery.floor){
             b1_img_html += '<span class="dataHeading"> [gallery] floor: </span>' + json_data_selectedObj.gallery.floor +'\n';
           }if (json_data_selectedObj.gallery.name){
-            b1_img_html += '[gallery] name: ' + json_data_selectedObj.gallery.name + '\n';
+            b1_img_html += '<strong>[gallery] name: </strong>' + json_data_selectedObj.gallery.name + '\n';
           }if (json_data_selectedObj.gallery.theme){
-            b1_img_html += '[gallery] theme: ' + json_data_selectedObj.gallery.theme;
+            b1_img_html += '<strong>[gallery] theme: </strong>' + json_data_selectedObj.gallery.theme;
           }
         b1_img_html += '</p>';
       

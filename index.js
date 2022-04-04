@@ -38,8 +38,9 @@ function art_object(object_ID, ids_ID, iiif_baseuri) {
 
 let display_objects = [];
 
+/*make sure the size for thumbnailSize matches the one set in client side script index.ejs */
 //const thumbnailSize = 108;
-const thumbnailSize = 40;
+const thumbnailSize = 108;
 
 function processData(api_data, art_obj_array = []) {
   for (let i = 0; i < api_data.length; i++) {
@@ -62,13 +63,16 @@ function processData(api_data, art_obj_array = []) {
   console.log(
     `number of objects in art objects array is ${art_obj_array.length}`
   );
+  let uniques = [...new Set(art_obj_array)];
+  console.log(`UNIQUIFIED OBJ ID ARRAY HAS ${uniques.length} elements`);
+
   return art_obj_array;
 }
 
 async function writeJSONtoFile(json_data) {
   const content = JSON.stringify(json_data);
   try {
-    Fs.writeFileSync("/static/allData.json", content);
+    Fs.writeFileSync(json_data_path, content);
     //file written successfully
     return true;
   } catch (err) {
@@ -92,7 +96,8 @@ async function getObject(object_id) {
 //"https://api.harvardartmuseums.org/object?apikey=bc950edf-09f5-4d10-8522-99818d613439&gallery=any&size=100&q=imagepermissionlevel:0 AND images.idsid:>0";
 
 const api_url =
-  "https://api.harvardartmuseums.org/object?apikey=bc950edf-09f5-4d10-8522-99818d613439&gallery=any&size=100&q=images.idsid:>0";
+  "https://api.harvardartmuseums.org/object?apikey=bc950edf-09f5-4d10-8522-99818d613439&gallery=any&size=100&sort=gallery.galleryid&q=images.idsid:%3E0";
+// "https://api.harvardartmuseums.org/object?apikey=bc950edf-09f5-4d10-8522-99818d613439&gallery=any&size=100&q=images.idsid:>0";
 
 //Async fetch all API data
 async function getAllData(api_url, page = 1, posts = []) {
@@ -212,6 +217,10 @@ app.get(
 
     display_objects = processData(data);
 
+    /*console.log(`display objects has ${display_objects.length} elements`);
+    let uniques = [...new Set(display_objects)];
+    console.log(`UNIQUIFIED display_objects HAS ${uniques.length} elements`);*/
+
     //DOWNLOAD IMAGES -- KEEP WORKING ON THIS
     //let test = await downloadImage(display_objects);
     //console.log("Downloaded image I think");
@@ -226,7 +235,7 @@ app.get(
 
 app.get("/", (req, res) => {
   //Read in name of files in art_images
-  let fileNames = Fs.readdirSync(art_images_folder);
+  //let fileNames = Fs.readdirSync(art_images_folder);
 
   //TO DO: when I was messing around with the folder, a .DS_Store
   //was introduced, this means urlArray had an element that said
@@ -257,7 +266,13 @@ app.get("/", (req, res) => {
   }
 
   console.log(`URL ARRAY HAS ${urlArray.length} elements`);
+  let uniques_url = [...new Set(urlArray)];
+  console.log(`UNIQUIFIED urlArray HAS ${uniques_url.length} elements`);
+
   console.log(`OBJ ID ARRAY HAS ${objIDs.length} elements`);
+  let uniques_obj = [...new Set(objIDs)];
+  console.log(`UNIQUIFIED objIDs ARRAY HAS ${uniques_obj.length} elements`);
+
   console.log(urlArray[0]);
   console.log(objIDs[0]);
 
