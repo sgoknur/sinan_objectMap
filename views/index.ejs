@@ -396,11 +396,16 @@
 
       let allData = [];
 
+      let gallery_sorted = [];
+
       function initialize(){
         /*Attach the selectArtObject function to every image displayed*/
+        /*Also save initial order because it is already sorted on gallery */ 
         let images = document.querySelectorAll(".art_img");
+       
         for (let i=0; i< images.length; i++){
           images[i].addEventListener("click", selectArtObject);
+          gallery_sorted.push({g_id : images[i].id, g_src : images[i].src});
         }
 
         //Read in the JSON
@@ -433,21 +438,31 @@
         let term_sort = event.target.textContent;
         term_sort = term_sort.slice(0, -2);
         console.log(`term sort is ${term_sort}`);
-        if (term_sort === 'dated'){
-          term_sort = 'dateend';
-        }
-
-        allData.sort(sortBy(term_sort));
-        //console.log(`first element sorted by ${term_sort} is ${allData[0].term_sort} and laster one is ${allData[1610].term_sort}`);
-       
+        
         let url_sorted ='';
         let artGrid_sorted = '';
-        for (let i=0; i< allData.length; i++){
-          url_sorted = allData[i].images[0].iiifbaseuri + "/square/" + thumbnailSize + ",/0/default.jpg";
-          //console.log(`sorted object is ${allData[i].id}`);
-          artGrid_sorted += `<img class="art_img" id=${allData[i].id} src=${url_sorted} onError="this.style.display='none'"/>`;
+
+        /*If the term is gallerynumber or [gallery] floor, then simply restore artGrid to its 
+        initial order */
+        if((term_sort === 'gallerynumber') || (term_sort === '[gallery] floor')){
+          for(let i = 0; i < gallery_sorted.length; i++){
+            artGrid_sorted += `<img class="art_img" id=${gallery_sorted[i].g_id} src=${gallery_sorted[i].g_src} onError="this.style.display='none'"/>`;
+          }
+        } else {
+          if (term_sort === 'dated'){
+          term_sort = 'dateend';}
+          
+          allData.sort(sortBy(term_sort));
+          //console.log(`first element sorted by ${term_sort} is ${allData[0].term_sort} and laster one is ${allData[1610].term_sort}`);
+       
+          for (let i=0; i< allData.length; i++){
+            url_sorted = allData[i].images[0].iiifbaseuri + "/square/" + thumbnailSize + ",/0/default.jpg";
+            //console.log(`sorted object is ${allData[i].id}`);
+            artGrid_sorted += `<img class="art_img" id=${allData[i].id} src=${url_sorted} onError="this.style.display='none'"/>`;
+          }
         }
 
+        
         //change the innerHTML of artGrid
         document.getElementById('artGrid').innerHTML = artGrid_sorted;
 
@@ -662,9 +677,9 @@
         
         let b1_img_html = '<p>';
           if (json_data_selectedObj.gallery.gallerynumber){
-            b1_img_html += '<span class="dataHeading"> gallerynumber: </span>' + json_data_selectedObj.gallery.gallerynumber + '\n';
+            b1_img_html += '<span class="dataHeading" onclick="sortClick(event)">gallerynumber: </span>' + json_data_selectedObj.gallery.gallerynumber + '\n';
           }if (json_data_selectedObj.gallery.floor){
-            b1_img_html += '<span class="dataHeading"> [gallery] floor: </span>' + json_data_selectedObj.gallery.floor +'\n';
+            b1_img_html += '<span class="dataHeading" onclick="sortClick(event)">[gallery] floor: </span>' + json_data_selectedObj.gallery.floor +'\n';
           }if (json_data_selectedObj.gallery.name){
             b1_img_html += '<strong>[gallery] name: </strong>' + json_data_selectedObj.gallery.name + '\n';
           }if (json_data_selectedObj.gallery.theme){
