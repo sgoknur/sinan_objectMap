@@ -9,6 +9,8 @@
 
     <!-- Chart.js CDN-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- LoDash CDN-->
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 
     
     <style>
@@ -24,10 +26,9 @@
       body {
         background-color: black;
         font-family: "Open Sans", sans-serif;
-        /*UNCOMMENT THIS FOR INSTALLATION COMMENTING OUT FOR TESTING*/
-        /*font-size: 200%;/
-        /*UNCOMMENT THIS FOR INSTALLATION COMMENTING OUT FOR TESTING*/
-        /* overflow: hidden;*/
+        /*NOTE FOR JEFF -- CAN YOU PLEASE UNCOMMENT FONT-SIZE & OVERFLOW FOR INSTALLATION 
+        font-size: 200%;
+        overflow: hidden;*/
       }
 
       .icon{
@@ -426,34 +427,6 @@
         });
       }
 
-      // Native sorting from https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore/
-      const sortBy = (key) => {
-        return (a, b) => (a[key] > b[key]) ? 1 : ((b[key] > a[key]) ? -1 : 0);
-      };
-      //use: fruits.concat().sort(sortBy("name"));
-
-
-      const sortingBy = (key) => {
-       // console.log('in sortingby first line');
-        return (a,b) => {
-         // console.log(`in sortingby in a. b  line ${a[key]} AND ${b[key]}`);
-        if(a[key] && b[key] && typeof a[key] === 'string' || a[key] instanceof String){
-          a[key] = a[key].replace(/\s+/g, '');
-          b[key] = b[key].replace(/\s+/g, '');
-          console.log(`in sortingby a[key] string ${a[key]} AND ${b[key]}`);
-          return a[key].localeCompare(b[key]);
-        } 
-        if (a[key] > b[key]) {
-          return 1;
-        } else if (b[key] > a[key]) {
-          return -1;
-        } else{
-          return 0;
-        }
-
-        }
-      };
-
       function sortClick(event){
         //console.log(`SORT IS CLICKED WITH CLASS ${event.target.className} AND WITH TEXT ${event.target.textContent}`);
         
@@ -479,9 +452,8 @@
           if (term_sort === 'dated'){
           term_sort = 'dateend';}
           
-          allData.sort(sortingBy(term_sort));
-          //console.log(`first element sorted by ${term_sort} is ${allData[0].term_sort} and laster one is ${allData[1610].term_sort}`);
-       
+          allData = _.sortBy(allData, term_sort);
+     
           for (let i=0; i< allData.length; i++){
             url_sorted = allData[i].images[0].iiifbaseuri + "/square/" + thumbnailSize + ",/0/default.jpg";
             //console.log(`sorted object is ${allData[i].id}`);
