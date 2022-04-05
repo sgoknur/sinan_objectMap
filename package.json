@@ -10,7 +10,8 @@
   "author": "sinan goknur",
   "license": "ISC",
   "engines": {
-    "node": "14.x"
+    "node": "17.x",
+    "npm": "8.x"
   },
   "dependencies": {
     "axios": "^0.26.1",
