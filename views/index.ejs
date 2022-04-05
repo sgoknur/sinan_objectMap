@@ -478,7 +478,7 @@
       function selectArtObject(evt){
         console.log(`selected art object is ${evt.target.id}`);
 
-          fetch(`http://localhost:3000/object/${this.id}`).then(response => {
+          fetch(`/object/${this.id}`).then(response => {
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
               throw new TypeError("Oops, we haven't got JSON!");
