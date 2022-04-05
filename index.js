@@ -9,7 +9,7 @@ const { redirect } = require("express/lib/response");
 const { nextTick } = require("process");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 const asyncHandler = require("express-async-handler");
 const { resolveObjectURL } = require("buffer");
